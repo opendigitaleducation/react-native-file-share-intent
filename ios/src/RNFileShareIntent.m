@@ -8,8 +8,12 @@
 
 #import "RNFileShareIntent.h"
 #import "RCTRootView.h"
+#import "OperationRetrieval.h"
+
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <RCTLog.h>
+
+
 @implementation RNFileShareIntent
 static NSItemProvider* ShareFileIntentModule_itemProvider;
 static NSExtensionContext* extContext;
@@ -107,7 +111,39 @@ RCT_EXPORT_METHOD(close)
     [ extContext completeRequestReturningItems: @[] completionHandler: nil ];
 }
 
+RCT_EXPORT_METHOD(getFiles:(RCTResponseSenderBlock)callback)
+{
+    [self getItems:(NSString *)kUTTypeImage withCallback:callback];
+}
 
+-(void) getItems:(NSString *)type withCallback:(RCTResponseSenderBlock)callback {
+    NSArray *inputItems = extContext.inputItems;
+    NSMutableArray *urls = [[NSMutableArray alloc] init];
+    for (int i = 0; i < [inputItems count]; i++) {
+        NSExtensionItem *item = (NSExtensionItem *) inputItems[i];
+        
+        if (item.attachments != nil) {
+            NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+            queue.maxConcurrentOperationCount = 1;
+            for (int j = 0; j < [item.attachments count]; j++) {
+                NSItemProvider *attachment = item.attachments[j];
+                if ([attachment hasItemConformingToTypeIdentifier:type]) {
+                    OperationRetrieval *operation = [[OperationRetrieval alloc] initWithItemProvider:attachment type:type completion:^(NSString *url) {
+                        [urls addObject:url];
+                    }];
+                    
+                    [queue addOperation:operation];
+                }
+            }
+            [queue addOperationWithBlock:^{
+                NSLog(@"urls length: %lu", [urls count]);
+                callback(@[[urls copy]]);
+            }];
+        } else {
+            callback(@[[urls copy]]);
+        }
+    }
+}
 
 
 
