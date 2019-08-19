@@ -5,10 +5,9 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableNativeArray;
 
-import com.ajithab.RNFileShareIntentPackage;
-
-import java.util.Map;
 import java.util.ArrayList;
 
 import android.widget.Toast;
@@ -36,7 +35,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
   }  
 
   @ReactMethod
-  public void getFilepath(Callback successCallback) {
+  public void getFilePath(Callback successCallback) {
     Activity mActivity = getCurrentActivity();
     
     if(mActivity == null) { return; }
@@ -70,6 +69,40 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
         } else {
           Toast.makeText(reactContext, "Type is not support", Toast.LENGTH_SHORT).show();
         }
+    }
+  }
+
+  @ReactMethod
+  public void getFiles(Callback successCallback) {
+    Activity mActivity = getCurrentActivity();
+
+    if(mActivity == null) { return; }
+
+    Intent intent = mActivity.getIntent();
+    String action = intent.getAction();
+    String type = intent.getType();
+
+    WritableArray res = new WritableNativeArray();
+    if (Intent.ACTION_SEND.equals(action) && type != null) {
+      if ("text/plain".equals(type)) {
+        String input = intent.getStringExtra(Intent.EXTRA_TEXT);
+        res.pushString(input);
+        successCallback.invoke(res);
+      } else if (type.startsWith("image/") || type.startsWith("video/") || type.startsWith("application/")) {
+        Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (fileUri != null) {
+          res.pushString(fileUri.toString());
+          successCallback.invoke(res);
+        }
+      }
+    } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
+      ArrayList<Uri> fileUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+      if (fileUris != null) {
+        for (Uri uri: fileUris) {
+          res.pushString(uri.toString());
+        }
+        successCallback.invoke(res);
+      }
     }
   }
 

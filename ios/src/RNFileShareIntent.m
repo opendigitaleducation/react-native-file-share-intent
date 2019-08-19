@@ -107,16 +107,30 @@ RCT_EXPORT_METHOD(openURL:(NSString *)url) {
 
 RCT_EXPORT_METHOD(close)
 {
-    
     [ extContext completeRequestReturningItems: @[] completionHandler: nil ];
 }
 
 RCT_EXPORT_METHOD(getFiles:(RCTResponseSenderBlock)callback)
 {
-    [self getItems:(NSString *)kUTTypeImage withCallback:callback];
+    NSArray *types = @[
+                       (NSString *)kUTTypePDF,
+                       (NSString *)kUTTypeBMP,
+                       (NSString *)kUTTypePNG,
+                       (NSString *)kUTTypeRTF,
+                       (NSString *)kUTTypeContent,
+                       (NSString *)kUTTypeData,
+                       (NSString *)kUTTypeMessage,
+                       (NSString *)kUTTypeArchive,
+                       @"com.microsoft.word.doc",
+                       @"com.microsoft.excel.xls",
+                       @"com.microsoft.powerpoint.​ppt",
+                       @"com.apple.keynote.key"
+                       ];
+
+    [self getItems:types withCallback:callback];
 }
 
--(void) getItems:(NSString *)type withCallback:(RCTResponseSenderBlock)callback {
+-(void) getItems:(NSArray *)types withCallback:(RCTResponseSenderBlock)callback {
     NSArray *inputItems = extContext.inputItems;
     NSMutableArray *urls = [[NSMutableArray alloc] init];
     for (int i = 0; i < [inputItems count]; i++) {
@@ -125,14 +139,17 @@ RCT_EXPORT_METHOD(getFiles:(RCTResponseSenderBlock)callback)
         if (item.attachments != nil) {
             NSOperationQueue *queue = [[NSOperationQueue alloc] init];
             queue.maxConcurrentOperationCount = 1;
-            for (int j = 0; j < [item.attachments count]; j++) {
-                NSItemProvider *attachment = item.attachments[j];
-                if ([attachment hasItemConformingToTypeIdentifier:type]) {
-                    OperationRetrieval *operation = [[OperationRetrieval alloc] initWithItemProvider:attachment type:type completion:^(NSString *url) {
-                        [urls addObject:url];
-                    }];
-                    
-                    [queue addOperation:operation];
+            for (int k = 0; k < [types count]; k++) {
+                NSString *type = types[k];
+                for (int j = 0; j < [item.attachments count]; j++) {
+                    NSItemProvider *attachment = item.attachments[j];
+                    if ([attachment hasItemConformingToTypeIdentifier:type]) {
+                        OperationRetrieval *operation = [[OperationRetrieval alloc] initWithItemProvider:attachment type:type completion:^(NSString *url) {
+                            [urls addObject:url];
+                        }];
+                        
+                        [queue addOperation:operation];
+                    }
                 }
             }
             [queue addOperationWithBlock:^{
