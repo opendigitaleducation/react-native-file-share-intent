@@ -7,9 +7,13 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import android.util.Log;
 import android.widget.Toast;
 import android.app.Activity;
 import android.content.Intent;
@@ -82,16 +86,14 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
     String action = intent.getAction();
     String type = intent.getType();
 
+    FileHelper fileHelper = new FileHelper(this.reactContext);
+
     WritableArray res = new WritableNativeArray();
     if (Intent.ACTION_SEND.equals(action) && type != null) {
-      if ("text/plain".equals(type)) {
-        String input = intent.getStringExtra(Intent.EXTRA_TEXT);
-        res.pushString(input);
-        successCallback.invoke(res);
-      } else if (type.startsWith("image/") || type.startsWith("video/") || type.startsWith("application/")) {
+      if (type.startsWith("image/") || type.startsWith("video/") || type.startsWith("application/")) {
         Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (fileUri != null) {
-          res.pushString(fileUri.toString());
+          res.pushMap(fileHelper.getFileData(fileUri));
           successCallback.invoke(res);
         }
       }
@@ -99,7 +101,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
       ArrayList<Uri> fileUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
       if (fileUris != null) {
         for (Uri uri: fileUris) {
-          res.pushString(uri.toString());
+          res.pushMap(fileHelper.getFileData(uri));
         }
         successCallback.invoke(res);
       }
