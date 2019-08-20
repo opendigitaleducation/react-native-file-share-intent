@@ -7,13 +7,14 @@
 //
 
 #import "OperationRetrieval.h"
+#import "FileHelper.h"
 
 @interface OperationRetrieval ()
 
 /**
  Completion block to be called once the the request and parsing is completed. Will return the parsed answers or nil.
  */
-@property (nonatomic, copy) void (^completion)(NSString *url);
+@property (nonatomic, copy) void (^completion)(NSDictionary *file);
 @property (nonatomic, copy) NSItemProvider *item;
 @property (nonatomic, copy) NSString *type;
 
@@ -23,7 +24,7 @@
 
 #pragma mark - Init
 
-- (instancetype)initWithItemProvider:(NSItemProvider *)item type:(NSString *)type completion:(void (^)(NSString *))completion {
+- (instancetype)initWithItemProvider:(NSItemProvider *)item type:(NSString *)type completion:(void (^)(NSDictionary *file))completion {
     self = [super init];
     
     if (self)
@@ -46,7 +47,7 @@
     [self.item loadItemForTypeIdentifier:self.type options:nil completionHandler:^(NSURL *url, NSError *error) {
         if (self.completion)
         {
-            self.completion(url.absoluteString);
+            self.completion([FileHelper getFileData:url]);
         }
         
         [self finish];

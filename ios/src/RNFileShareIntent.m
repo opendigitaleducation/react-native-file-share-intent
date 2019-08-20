@@ -133,9 +133,10 @@ RCT_EXPORT_METHOD(getFiles:(RCTResponseSenderBlock)callback)
                 NSString *type = types[k];
                 for (int j = 0; j < [item.attachments count]; j++) {
                     NSItemProvider *attachment = item.attachments[j];
+                    
                     if ([attachment hasItemConformingToTypeIdentifier:type]) {
-                        OperationRetrieval *operation = [[OperationRetrieval alloc] initWithItemProvider:attachment type:type completion:^(NSString *url) {
-                            [urls addObject:url];
+                        OperationRetrieval *operation = [[OperationRetrieval alloc] initWithItemProvider:attachment type:type completion:^(NSDictionary *fileData) {
+                            [urls addObject:fileData];
                         }];
                         
                         [queue addOperation:operation];

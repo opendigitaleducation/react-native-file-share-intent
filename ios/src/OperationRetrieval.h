@@ -17,6 +17,6 @@
  
  @return `OperationRetrieval` instance.
  */
-- (instancetype)initWithItemProvider: (NSItemProvider *)item type: (NSString *)type completion:(void (^)(NSString *url))completion;
+- (instancetype)initWithItemProvider: (NSItemProvider *)item type: (NSString *)type completion:(void (^)(NSDictionary *file))completion;
 
 @end
