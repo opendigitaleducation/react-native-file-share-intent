@@ -113,18 +113,8 @@ RCT_EXPORT_METHOD(close)
 RCT_EXPORT_METHOD(getFiles:(RCTResponseSenderBlock)callback)
 {
     NSArray *types = @[
-                       (NSString *)kUTTypePDF,
-                       (NSString *)kUTTypeBMP,
-                       (NSString *)kUTTypePNG,
-                       (NSString *)kUTTypeRTF,
-                       (NSString *)kUTTypeContent,
-                       (NSString *)kUTTypeData,
-                       (NSString *)kUTTypeMessage,
-                       (NSString *)kUTTypeArchive,
-                       @"com.microsoft.word.doc",
-                       @"com.microsoft.excel.xls",
-                       @"com.microsoft.powerpoint.​ppt",
-                       @"com.apple.keynote.key"
+                       (NSString *)kUTTypeImage,
+                       (NSString *)kUTTypeText,
                        ];
 
     [self getItems:types withCallback:callback];
@@ -153,7 +143,6 @@ RCT_EXPORT_METHOD(getFiles:(RCTResponseSenderBlock)callback)
                 }
             }
             [queue addOperationWithBlock:^{
-                NSLog(@"urls length: %lu", [urls count]);
                 callback(@[[urls copy]]);
             }];
         } else {
