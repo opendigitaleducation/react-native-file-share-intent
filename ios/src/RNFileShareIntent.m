@@ -114,7 +114,7 @@ RCT_EXPORT_METHOD(getFiles:(RCTResponseSenderBlock)callback)
 {
     NSArray *types = @[
                        (NSString *)kUTTypeImage,
-                       (NSString *)kUTTypeText,
+                       (NSString *)kUTTypeContent
                        ];
 
     [self getItems:types withCallback:callback];
@@ -123,12 +123,12 @@ RCT_EXPORT_METHOD(getFiles:(RCTResponseSenderBlock)callback)
 -(void) getItems:(NSArray *)types withCallback:(RCTResponseSenderBlock)callback {
     NSArray *inputItems = extContext.inputItems;
     NSMutableArray *urls = [[NSMutableArray alloc] init];
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    queue.maxConcurrentOperationCount = 1;
     for (int i = 0; i < [inputItems count]; i++) {
         NSExtensionItem *item = (NSExtensionItem *) inputItems[i];
         
         if (item.attachments != nil) {
-            NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-            queue.maxConcurrentOperationCount = 1;
             for (int k = 0; k < [types count]; k++) {
                 NSString *type = types[k];
                 for (int j = 0; j < [item.attachments count]; j++) {
@@ -143,13 +143,12 @@ RCT_EXPORT_METHOD(getFiles:(RCTResponseSenderBlock)callback)
                     }
                 }
             }
-            [queue addOperationWithBlock:^{
-                callback(@[[urls copy]]);
-            }];
-        } else {
-            callback(@[[urls copy]]);
+            
         }
     }
+    [queue addOperationWithBlock:^{
+        callback(@[[urls copy]]);
+    }];
 }
 
 
