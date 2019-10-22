@@ -1,6 +1,7 @@
 
 package com.ajithab;
 
+import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -20,69 +21,45 @@ import android.content.Intent;
 import android.net.Uri;
 
 
-public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
+public class RNFileShareIntentModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
+  private Callback successShareCallback;
   private final ReactApplicationContext reactContext;
 
   public RNFileShareIntentModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
+    reactContext.addActivityEventListener(this);
   }
 
 
-  protected void onNewIntent(Intent intent) {
+  @Override
+  public void onNewIntent(Intent intent) {
     Activity mActivity = getCurrentActivity();
     
     if(mActivity == null) { return; }
 
     mActivity.setIntent(intent);
-  }  
-
-  @ReactMethod
-  public void getFilePath(Callback successCallback) {
-    Activity mActivity = getCurrentActivity();
-    
-    if(mActivity == null) { return; }
-    
-    Intent intent = mActivity.getIntent();
-    String action = intent.getAction();
-    String type = intent.getType();
-
-    if (Intent.ACTION_SEND.equals(action) && type != null) {
-      if ("text/plain".equals(type)) {
-        String input = intent.getStringExtra(Intent.EXTRA_TEXT);
-        successCallback.invoke(input);
-      } else if (type.startsWith("image/") || type.startsWith("video/") || type.startsWith("application/")) {
-        Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
-        if (fileUri != null) {
-          successCallback.invoke(fileUri.toString());
-        }
-      }else {
-        Toast.makeText(reactContext, "Type is not support", Toast.LENGTH_SHORT).show();
-      }
-    } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
-        if (type.startsWith("image/") || type.startsWith("video/") || type.startsWith("application/")) {
-          ArrayList<Uri> fileUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
-          if (fileUris != null) {
-            String completeString = new String();
-            for (Uri uri: fileUris) {
-              completeString += uri.toString() + ",";
-            }
-            successCallback.invoke(completeString);
-          }
-        } else {
-          Toast.makeText(reactContext, "Type is not support", Toast.LENGTH_SHORT).show();
-        }
-    }
+    shareFile(intent);
   }
 
   @ReactMethod
-  public void getFiles(Callback successCallback) {
+  public void setCallback(Callback successCallback) {
+    successShareCallback = successCallback;
+  }
+
+  @ReactMethod
+  public void getFilePath(Callback successCallback) {
+    successShareCallback = successCallback;
     Activity mActivity = getCurrentActivity();
 
     if(mActivity == null) { return; }
 
     Intent intent = mActivity.getIntent();
+    shareFile(intent);
+  }
+
+  private void shareFile(Intent intent) {
     String action = intent.getAction();
     String type = intent.getType();
 
@@ -94,7 +71,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
         Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (fileUri != null) {
           res.pushMap(fileHelper.getFileData(fileUri));
-          successCallback.invoke(res);
+          successShareCallback.invoke(res);
         }
       }
     } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
@@ -103,7 +80,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
         for (Uri uri: fileUris) {
           res.pushMap(fileHelper.getFileData(uri));
         }
-        successCallback.invoke(res);
+        successShareCallback.invoke(res);
       }
     }
   }
@@ -126,4 +103,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
   public String getName() {
     return "RNFileShareIntent";
   }
+  
+  @Override
+  public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data){}
 }
