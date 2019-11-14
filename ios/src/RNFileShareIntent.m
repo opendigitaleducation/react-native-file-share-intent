@@ -12,6 +12,7 @@
 
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <RCTLog.h>
+#import "FileHelper.h"
 
 
 @implementation RNFileShareIntent
@@ -144,7 +145,9 @@ RCT_EXPORT_METHOD(getFiles:(RCTResponseSenderBlock)callback)
     }];
 }
 
-
+RCT_EXPORT_METHOD(clearSharedFolder) {
+    [FileHelper clearSharedFolder];
+}
 
 +(void) setShareFileIntentModule_itemProvider: (NSItemProvider*) itemProvider
 {

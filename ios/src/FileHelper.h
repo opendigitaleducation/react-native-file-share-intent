@@ -16,4 +16,6 @@
 
 + (NSDictionary *)getFileData:(NSURL *)url;
 
++ (void)clearSharedFolder;
+
 @end
