@@ -3,8 +3,8 @@
     package="com.ajithab.test" >
 
     <uses-sdk
-        android:minSdkVersion="16"
-        android:targetSdkVersion="22" />
+        android:minSdkVersion="19"
+        android:targetSdkVersion="28" />
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
@@ -13,9 +13,12 @@
         android:label="Tests for com.ajithab.test"
         android:targetPackage="com.ajithab.test" />
 
-    <application
-        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-        android:debuggable="true" >
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application android:debuggable="true" >
         <uses-library android:name="android.test.runner" />
     </application>
 
