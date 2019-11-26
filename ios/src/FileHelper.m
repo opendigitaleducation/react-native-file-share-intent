@@ -31,6 +31,7 @@
                                @"name": [FileHelper fileNameFromPath: [url absoluteString]],
                                @"oldpath": [url absoluteString],
                                @"sharedPath": [FileHelper saveImageToAppGroupFolder:url]
+                               @"uri": [url absoluteString],
                                };
     
     return fileData;

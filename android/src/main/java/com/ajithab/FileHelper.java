@@ -74,6 +74,7 @@ public class FileHelper {
         fileData.putString("name", this.getFileName(uri));
         fileData.putString("mime", this.getMimeType(uri));
         fileData.putString("path", "file://" + this.getFilePath(uri));
+        fileData.putString("uri", uri.toString());
 
         return fileData;
     }
