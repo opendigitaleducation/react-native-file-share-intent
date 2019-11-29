@@ -66,9 +66,17 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
     FileHelper fileHelper = new FileHelper(this.reactContext);
 
     WritableArray res = new WritableNativeArray();
-    if (Intent.ACTION_SEND.equals(action) && type != null) {
-      if (type.startsWith("image/") || type.startsWith("video/") || type.startsWith("application/")) {
+    if (Intent.ACTION_SEND.equals(action) && type != null)
+      if (type.startsWith("application/") || type.startsWith("audio/") || type.startsWith("image/") || type.startsWith("message/") ||
+          type.startsWith("video/") || type.startsWith("x-world/") {
         Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (fileUri != null) {
+          res.pushMap(fileHelper.getFileData(fileUri));
+          successShareCallback.invoke(res);
+        }
+      }
+      if (type.startsWith(type.startsWith("text/") || type.startsWith("video/") || type.startsWith("x-world/") {
+        Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_TEXT);
         if (fileUri != null) {
           res.pushMap(fileHelper.getFileData(fileUri));
           successShareCallback.invoke(res);
@@ -95,9 +103,10 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
     String type = intent.getType();
     if (type == null) { return; }
 
-    if ("text/plain".equals(type)) {
+    if (type.startsWith("text/")) {
       intent.removeExtra(Intent.EXTRA_TEXT);
-    } else if (type.startsWith("image/") || type.startsWith("video/") || type.startsWith("application/")) {
+    } else if (type.startsWith("image/") || type.startsWith("video/") || type.startsWith("application/") ||
+            type.startsWith("image/") || type.startsWith("video/") || type.startsWith("application/")) {
       intent.removeExtra(Intent.EXTRA_STREAM);
     }
   }
