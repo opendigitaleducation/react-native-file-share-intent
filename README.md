@@ -53,7 +53,7 @@ export default class App extends Component {
  
   componentDidMount() {
    if(RNFileShareIntent){
-     RNFileShareIntent.getFilepath((url) => {
+     RNFileShareIntent.getFilePath((url) => {
        this.setState({ fileUrl: url }); 
        })  
    }
