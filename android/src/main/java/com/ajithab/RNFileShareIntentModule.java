@@ -36,7 +36,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
   @Override
   public void onNewIntent(Intent intent) {
     Activity mActivity = getCurrentActivity();
-    
+
     if(mActivity == null) { return; }
 
     mActivity.setIntent(intent);
@@ -75,7 +75,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
           successShareCallback.invoke(res);
         }
       }
-      if (type.startsWith(type.startsWith("text/") || type.startsWith("video/") || type.startsWith("x-world/") {
+      if (type.startsWith(type.startsWith("text/") || type.startsWith("x-world/") {
         Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_TEXT);
         if (fileUri != null) {
           res.pushMap(fileHelper.getFileData(fileUri));
@@ -96,17 +96,17 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
   @ReactMethod
   public void clearFilePath() {
     Activity mActivity = getCurrentActivity();
-    
+
     if(mActivity == null) { return; }
 
     Intent intent = mActivity.getIntent();
     String type = intent.getType();
     if (type == null) { return; }
 
-    if (type.startsWith("text/")) {
+    if (type.startsWith("text/") || type.startsWith("x-world/") {
       intent.removeExtra(Intent.EXTRA_TEXT);
-    } else if (type.startsWith("image/") || type.startsWith("video/") || type.startsWith("application/") ||
-            type.startsWith("image/") || type.startsWith("video/") || type.startsWith("application/")) {
+    } else if (type.startsWith("image/") || type.startsWith("audio/") || type.startsWith("application/") ||
+            || type.startsWith("x-world/") || type.startsWith("message/") || type.startsWith("video/")) {
       intent.removeExtra(Intent.EXTRA_STREAM);
     }
   }
@@ -114,7 +114,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
   public String getName() {
     return "RNFileShareIntent";
   }
-  
+
   @Override
   public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data){}
 }
