@@ -16,7 +16,7 @@ public class FileHelper {
     public FileHelper(ReactApplicationContext reactContext) {
         this.reactContext = reactContext;
     }
-    
+
     public String getFileName(Uri uri) {
         String result = "";
         if (uri.getScheme().equals("content")) {
@@ -47,24 +47,28 @@ public class FileHelper {
     public String getFilePath(Uri uri) {
         String[] columns = { MediaStore.Images.Media.DATA };
         String result = "";
-        if (uri.getScheme().equals("content")) {
-            Cursor cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    int columnIndex;
-                    columnIndex = cursor.getColumnIndex(columns[0]);
-                    result = cursor.getString(columnIndex);
+        try {
+            if (uri.getScheme().equals("content")) {
+                Cursor cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
+                    if (cursor != null && cursor.moveToFirst()) {
+                        int columnIndex;
+                        columnIndex = cursor.getColumnIndex(columns[0]);
+                        result = cursor.getString(columnIndex);
+                    }
+            }
+            if (result == null) {
+                result = uri.getPath();
+                int cut = result.lastIndexOf('/');
+                if (cut != -1) {
+                    result = result.substring(cut + 1);
                 }
-            } finally {
-                cursor.close();
             }
         }
-        if (result == null) {
-            result = uri.getPath();
-            int cut = result.lastIndexOf('/');
-            if (cut != -1) {
-                result = result.substring(cut + 1);
-            }
+        catch(Exception e) {
+            result = "";
+        }
+        finally {
+            cursor.close();
         }
         return result;
     }
@@ -73,7 +77,7 @@ public class FileHelper {
         WritableMap fileData = new WritableNativeMap();
         fileData.putString("name", this.getFileName(uri));
         fileData.putString("mime", this.getMimeType(uri));
-        fileData.putString("path", "file://" + this.getFilePath(uri));
+        fileData.putString("path", "");
         fileData.putString("uri", uri.toString());
 
         return fileData;
