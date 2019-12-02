@@ -64,6 +64,9 @@ public class FileHelper {
                 }
             }
         }
+        catch(Exception e) {
+            result = "";
+        }
         finally {
             cursor.close();
         }
