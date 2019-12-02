@@ -16,7 +16,7 @@ public class FileHelper {
     public FileHelper(ReactApplicationContext reactContext) {
         this.reactContext = reactContext;
     }
-    
+
     public String getFileName(Uri uri) {
         String result = "";
         if (uri.getScheme().equals("content")) {
@@ -73,7 +73,7 @@ public class FileHelper {
         WritableMap fileData = new WritableNativeMap();
         fileData.putString("name", this.getFileName(uri));
         fileData.putString("mime", this.getMimeType(uri));
-        fileData.putString("path", "file://" + this.getFilePath(uri));
+        fileData.putString("path", "");
         fileData.putString("uri", uri.toString());
 
         return fileData;
