@@ -1,7 +1,6 @@
 
 package com.ajithab;
 
-import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -21,7 +20,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 
-public class RNFileShareIntentModule extends ReactContextBaseJavaModule implements ActivityEventListener {
+public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
 
   private Callback successShareCallback;
   private final ReactApplicationContext reactContext;
@@ -29,7 +28,6 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
   public RNFileShareIntentModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
-    reactContext.addActivityEventListener(this);
   }
 
 
@@ -66,16 +64,16 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
     FileHelper fileHelper = new FileHelper(this.reactContext);
 
     WritableArray res = new WritableNativeArray();
-    if (Intent.ACTION_SEND.equals(action) && type != null)
+    if (Intent.ACTION_SEND.equals(action) && type != null) {
       if (type.startsWith("application/") || type.startsWith("audio/") || type.startsWith("image/") || type.startsWith("message/") ||
-          type.startsWith("video/") || type.startsWith("x-world/") {
+          type.startsWith("video/") || type.startsWith("x-world/")) {
         Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (fileUri != null) {
           res.pushMap(fileHelper.getFileData(fileUri));
           successShareCallback.invoke(res);
         }
       }
-      if (type.startsWith(type.startsWith("text/") || type.startsWith("x-world/") {
+      if (type.startsWith("text/") || type.startsWith("x-world/")) {
         Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_TEXT);
         if (fileUri != null) {
           res.pushMap(fileHelper.getFileData(fileUri));
@@ -103,10 +101,10 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
     String type = intent.getType();
     if (type == null) { return; }
 
-    if (type.startsWith("text/") || type.startsWith("x-world/") {
+    if (type.startsWith("text/") || type.startsWith("x-world/")) {
       intent.removeExtra(Intent.EXTRA_TEXT);
     } else if (type.startsWith("image/") || type.startsWith("audio/") || type.startsWith("application/") ||
-            || type.startsWith("x-world/") || type.startsWith("message/") || type.startsWith("video/")) {
+            type.startsWith("x-world/") || type.startsWith("message/") || type.startsWith("video/")) {
       intent.removeExtra(Intent.EXTRA_STREAM);
     }
   }
@@ -114,7 +112,4 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
   public String getName() {
     return "RNFileShareIntent";
   }
-
-  @Override
-  public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data){}
 }

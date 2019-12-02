@@ -3,7 +3,7 @@
     package="com.ajithab.test" >
 
     <uses-sdk
-        android:minSdkVersion="19"
+        android:minSdkVersion="16"
         android:targetSdkVersion="28" />
 
     <instrumentation
