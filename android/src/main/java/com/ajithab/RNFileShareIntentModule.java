@@ -36,6 +36,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
     if(mActivity == null) { return; }
 
     mActivity.setIntent(intent);
+    shareFile(intent);
   }
 
   @ReactMethod
@@ -45,6 +46,10 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
     if(mActivity == null) { return; }
 
     Intent intent = mActivity.getIntent();
+    shareFile(intent);
+  }
+
+  private void shareFile(Intent intent) {
     String action = intent.getAction();
     String type = intent.getType();
 
@@ -97,4 +102,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
   public String getName() {
     return "RNFileShareIntent";
   }
+
+  @Override
+  public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data){}
 }

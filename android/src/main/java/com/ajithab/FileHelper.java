@@ -47,24 +47,25 @@ public class FileHelper {
     public String getFilePath(Uri uri) {
         String[] columns = { MediaStore.Images.Media.DATA };
         String result = "";
-        if (uri.getScheme().equals("content")) {
-            Cursor cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    int columnIndex;
-                    columnIndex = cursor.getColumnIndex(columns[0]);
-                    result = cursor.getString(columnIndex);
+        try {
+            if (uri.getScheme().equals("content")) {
+                Cursor cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
+                    if (cursor != null && cursor.moveToFirst()) {
+                        int columnIndex;
+                        columnIndex = cursor.getColumnIndex(columns[0]);
+                        result = cursor.getString(columnIndex);
+                    }
+            }
+            if (result == null) {
+                result = uri.getPath();
+                int cut = result.lastIndexOf('/');
+                if (cut != -1) {
+                    result = result.substring(cut + 1);
                 }
-            } finally {
-                cursor.close();
             }
         }
-        if (result == null) {
-            result = uri.getPath();
-            int cut = result.lastIndexOf('/');
-            if (cut != -1) {
-                result = result.substring(cut + 1);
-            }
+        finally {
+            cursor.close();
         }
         return result;
     }
