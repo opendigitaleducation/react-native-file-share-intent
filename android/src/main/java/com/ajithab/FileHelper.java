@@ -19,37 +19,49 @@ public class FileHelper {
 
     public String getFileName(Uri uri) {
         String result = "";
-        if (uri.getScheme().equals("content")) {
-            Cursor cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+
+        try {
+            if (uri.getScheme().equals("content")) {
+                Cursor cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
+                try {
+                    if (cursor != null && cursor.moveToFirst()) {
+                        result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                    }
+                } finally {
+                    cursor.close();
                 }
-            } finally {
-                cursor.close();
+            }
+            if (result == null) {
+                result = uri.getPath();
+                int cut = result.lastIndexOf('/');
+                if (cut != -1) {
+                    result = result.substring(cut + 1);
+                }
             }
         }
-        if (result == null) {
-            result = uri.getPath();
-            int cut = result.lastIndexOf('/');
-            if (cut != -1) {
-                result = result.substring(cut + 1);
-            }
+        finally {
         }
         return result;
     }
 
     public String getMimeType(Uri uri) {
-        String type = this.reactContext.getContentResolver().getType(uri);
+        String type = "";
+
+        try {
+            type = this.reactContext.getContentResolver().getType(uri);
+        }
+        finally {}
+
         return type;
     }
 
     public String getFilePath(Uri uri) {
         String[] columns = { MediaStore.Images.Media.DATA };
-        String result = "";
+        String result = null;
+        Cursor cursor = null;
         try {
             if (uri.getScheme().equals("content")) {
-                Cursor cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
+                cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
                     if (cursor != null && cursor.moveToFirst()) {
                         int columnIndex;
                         columnIndex = cursor.getColumnIndex(columns[0]);
@@ -64,11 +76,9 @@ public class FileHelper {
                 }
             }
         }
-        catch(Exception e) {
-            result = "";
-        }
         finally {
-            cursor.close();
+            if (cursor != null)
+                cursor.close();
         }
         return result;
     }

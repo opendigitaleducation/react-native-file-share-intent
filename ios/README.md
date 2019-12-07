@@ -73,7 +73,14 @@ NSItemProvider *itemProvider = item.attachments.firstObject;
 [RNFileShareIntent setShareFileIntentModule_itemProvider:itemProvider];
 [RNFileShareIntent setContext: self.extensionContext];
 
+
+#if DEBUG
 jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"Share" fallbackResource:nil];
+#else
+jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/share.bundle?platform=ios&dev=true"]; 
+// Change localhost to your network Ip for your Device Debugging
+#endif
+
 
 RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
 moduleName:@"Share"

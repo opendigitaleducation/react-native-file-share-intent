@@ -11,7 +11,7 @@
 #import "OperationRetrieval.h"
 
 #import <MobileCoreServices/MobileCoreServices.h>
-#import <RCTLog.h>
+#import "RCTLog.h"
 #import "FileHelper.h"
 
 
@@ -122,23 +122,23 @@ RCT_EXPORT_METHOD(getFiles:(RCTResponseSenderBlock)callback)
     queue.maxConcurrentOperationCount = 1;
     for (int i = 0; i < [inputItems count]; i++) {
         NSExtensionItem *item = (NSExtensionItem *) inputItems[i];
-        
+
         if (item.attachments != nil) {
             for (int k = 0; k < [types count]; k++) {
                 NSString *type = types[k];
                 for (int j = 0; j < [item.attachments count]; j++) {
                     NSItemProvider *attachment = item.attachments[j];
-                    
+
                     if ([attachment hasItemConformingToTypeIdentifier:type]) {
                         OperationRetrieval *operation = [[OperationRetrieval alloc] initWithItemProvider:attachment type:type completion:^(NSDictionary *fileData) {
                             [urls addObject:fileData];
                         }];
-                        
+
                         [queue addOperation:operation];
                     }
                 }
             }
-            
+
         }
     }
     [queue addOperationWithBlock:^{

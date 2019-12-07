@@ -29,11 +29,9 @@
     NSDictionary *fileData = @{
                                @"mime": [FileHelper MIMETypeFromURL:url],
                                @"name": [FileHelper fileNameFromPath: [url absoluteString]],
-                               @"oldpath": [url absoluteString],
-                               @"sharedPath": [FileHelper saveImageToAppGroupFolder:url]
-                               @"uri": [url absoluteString],
+                               @"path": [FileHelper saveImageToAppGroupFolder:url]
                                };
-    
+
     return fileData;
 }
 
@@ -41,14 +39,14 @@
 {
     NSString *fileName = [FileHelper fileNameFromPath: [image absoluteString]];
     NSString *filePath = [[FileHelper getSharedFolderPath] stringByAppendingPathComponent: fileName ];
-    
+
     NSError * error = nil;
     if(![[NSFileManager defaultManager] copyItemAtPath:image.path toPath:filePath error:&error]) {
         NSLog(@"Could not copy report at path %@ to path %@. error %@", image.path , filePath, error);
     } else {
         NSLog(@"COPIED SUCCESSFULLY");
     }
-    
+
     return filePath;
 }
 
@@ -57,7 +55,7 @@
     NSString *APP_SHARE_GROUP = @"group.com.levuro.engage";
     NSURL *containerURL = [ [ NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier: APP_SHARE_GROUP ];
     NSString *documentsPath = containerURL.path;
-    
+
     return documentsPath;
 }
 
