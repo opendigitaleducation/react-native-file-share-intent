@@ -16,49 +16,16 @@ import android.content.Intent;
 import android.net.Uri;
 
 
-public class RNFileShareIntentModule extends ReactContextBaseJavaModule implements ActivityEventListener {
-
-  private Callback successShareCallback;
-  private final ReactApplicationContext reactContext;
-
-  public RNFileShareIntentModule(ReactApplicationContext reactContext) {
-    super(reactContext);
-    this.reactContext = reactContext;
-  }
-
-  public void onNewIntent(Intent intent) {
-    Activity mActivity = getCurrentActivity();
-
-    if(mActivity == null) { return; }
-
-    mActivity.setIntent(intent);
-    shareFile(intent);
-  }
-
-  @Override
-  public void onActivityResult(Activity aActivity, int requestCode, int resultCode, Intent intent) {
-    shareFile(intent);
-  }
-
-  @ReactMethod
-  public void setCallback(Callback successCallback) {
-    successShareCallback = successCallback;
-  }
+public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void getFilePath(Callback successCallback) {
-    successShareCallback = successCallback;
-    reactContext.addActivityEventListener(this);
 
     Activity mActivity = getCurrentActivity();
 
     if(mActivity == null) { return; }
 
     Intent intent = mActivity.getIntent();
-    shareFile(intent);
-  }
-
-  private void shareFile(Intent intent) {
     if (intent == null)
       return;
 
@@ -72,11 +39,11 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
 
     WritableArray res = new WritableNativeArray();
     if (Intent.ACTION_SEND.equals(action)) {
-      if (type.startsWith("text")) {
+      if (type.startsWith("text/plain")) {
         String input = intent.getStringExtra(Intent.EXTRA_TEXT);
         successShareCallback.invoke(input, type);
-      } else if (type.startsWith("application/") || type.startsWith("audio/") || type.startsWith("image/") || type.startsWith("message/") ||
-          type.startsWith("video/") || type.startsWith("x-world/")) {
+      } else if (type.startsWith("application/") || type.startsWith("audio/") || type.startsWith("image/") ||
+          type.startsWith("video/")) {
         Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (fileUri != null) {
           res.pushMap(fileHelper.getFileData(fileUri));
@@ -90,7 +57,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
           for (Uri uri : fileUris) {
             res.pushMap(fileHelper.getFileData(uri));
           }
-          successShareCallback.invoke(res);
+          successCallback.invoke(res);
         }
       }
     }

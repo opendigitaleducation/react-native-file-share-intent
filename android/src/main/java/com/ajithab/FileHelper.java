@@ -31,7 +31,7 @@ public class FileHelper {
                     cursor.close();
                 }
             }
-            if (result == null) {
+            if (result == null || "".equals(result)) {
                 result = uri.getPath();
                 int cut = result.lastIndexOf('/');
                 if (cut != -1) {
@@ -39,7 +39,7 @@ public class FileHelper {
                 }
             }
         }
-        finally {
+        catch( Exception e) {
         }
         return result;
     }
@@ -50,6 +50,9 @@ public class FileHelper {
         try {
             type = this.reactContext.getContentResolver().getType(uri);
         }
+        catch( Exception e) {
+            type = "";
+        }
         finally {}
 
         return type;
@@ -57,7 +60,7 @@ public class FileHelper {
 
     public String getFilePath(Uri uri) {
         String[] columns = { MediaStore.Images.Media.DATA };
-        String result = null;
+        String result = "";
         Cursor cursor = null;
         try {
             if (uri.getScheme().equals("content")) {
@@ -68,7 +71,7 @@ public class FileHelper {
                         result = cursor.getString(columnIndex);
                     }
             }
-            if (result == null) {
+            if (result == null || "".equals(result)) {
                 result = uri.getPath();
                 int cut = result.lastIndexOf('/');
                 if (cut != -1) {
@@ -76,6 +79,7 @@ public class FileHelper {
                 }
             }
         }
+        catch( Exception e) {}
         finally {
             if (cursor != null)
                 cursor.close();
