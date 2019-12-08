@@ -2,7 +2,7 @@
 
 Adds the application to the share intent of the device, so it can be launched from other apps and receive data from them 
 
-
+Sample app: https://github.com/JacquesBonet/FileShareIntentExample
 
 
 ## Installation
