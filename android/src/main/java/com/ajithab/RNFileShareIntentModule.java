@@ -15,8 +15,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 
-
 public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
+  private final ReactApplicationContext reactContext;
+
+  public RNFileShareIntentModule(ReactApplicationContext reactContext) {
+    super(reactContext);
+    this.reactContext = reactContext;
+  }
 
   @ReactMethod
   public void getFilePath(Callback successCallback) {
@@ -41,13 +46,13 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
     if (Intent.ACTION_SEND.equals(action)) {
       if (type.startsWith("text/plain")) {
         String input = intent.getStringExtra(Intent.EXTRA_TEXT);
-        successShareCallback.invoke(input, type);
+        successCallback.invoke(input, type);
       } else if (type.startsWith("application/") || type.startsWith("audio/") || type.startsWith("image/") ||
           type.startsWith("video/")) {
         Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (fileUri != null) {
           res.pushMap(fileHelper.getFileData(fileUri));
-          successShareCallback.invoke(res);
+          successCallback.invoke(res);
         }
       }
     } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
