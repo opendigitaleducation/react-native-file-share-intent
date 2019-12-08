@@ -16,6 +16,12 @@ import android.content.Intent;
 import android.net.Uri;
 
 public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
+  private final ReactApplicationContext reactContext;
+
+  public RNFileShareIntentModule(ReactApplicationContext reactContext) {
+    super(reactContext);
+    this.reactContext = reactContext;
+  }
 
   @ReactMethod
   public void getFilePath(Callback successCallback) {
