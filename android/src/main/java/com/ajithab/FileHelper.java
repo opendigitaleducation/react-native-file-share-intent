@@ -84,6 +84,7 @@ public class FileHelper {
             if (cursor != null)
                 cursor.close();
         }
+
         return result;
     }
 
