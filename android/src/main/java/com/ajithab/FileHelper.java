@@ -18,71 +18,57 @@ public class FileHelper {
     }
 
     public String getFileName(Uri uri) {
-        String result = "";
+        String result = null;
 
-        try {
-            if (uri.getScheme().equals("content")) {
-                Cursor cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
-                try {
-                    if (cursor != null && cursor.moveToFirst()) {
-                        result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                    }
-                } finally {
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                if (cursor != null)
                     cursor.close();
-                }
-            }
-            if (result == null || "".equals(result)) {
-                result = uri.getPath();
-                int cut = result.lastIndexOf('/');
-                if (cut != -1) {
-                    result = result.substring(cut + 1);
-                }
             }
         }
-        catch( Exception e) {
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
         }
         return result;
     }
 
     public String getMimeType(Uri uri) {
-        String type = "";
-
-        try {
-            type = this.reactContext.getContentResolver().getType(uri);
-        }
-        catch( Exception e) {
-            type = "";
-        }
-        finally {}
-
-        return type;
+        return this.reactContext.getContentResolver().getType(uri);
     }
 
     public String getFilePath(Uri uri) {
         String[] columns = { MediaStore.Images.Media.DATA };
-        String result = "";
+        String result = null;
         Cursor cursor = null;
-        try {
-            if (uri.getScheme().equals("content")) {
-                cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
-                    if (cursor != null && cursor.moveToFirst()) {
-                        int columnIndex;
-                        columnIndex = cursor.getColumnIndex(columns[0]);
-                        result = cursor.getString(columnIndex);
-                    }
-            }
-            if (result == null || "".equals(result)) {
-                result = uri.getPath();
-                int cut = result.lastIndexOf('/');
-                if (cut != -1) {
-                    result = result.substring(cut + 1);
+
+        if (uri.getScheme().equals("content")) {
+            cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int columnIndex;
+                    columnIndex = cursor.getColumnIndex(columns[0]);
+                    result = cursor.getString(columnIndex);
                 }
+            } finally {
+                if (cursor != null)
+                    cursor.close();
             }
         }
-        catch( Exception e) {}
-        finally {
-            if (cursor != null)
-                cursor.close();
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
         }
 
         return result;
