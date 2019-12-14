@@ -1,5 +1,7 @@
 package com.ajithab;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
@@ -8,6 +10,7 @@ import android.net.Uri;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.webkit.MimeTypeMap;
 
 public class FileHelper {
 
@@ -42,7 +45,16 @@ public class FileHelper {
     }
 
     public String getMimeType(Uri uri) {
-        return this.reactContext.getContentResolver().getType(uri);
+        String mimeType = null;
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            mimeType = this.reactContext.getContentResolver().getType(uri);
+        } else {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                    .toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    fileExtension.toLowerCase());
+        }
+        return mimeType;
     }
 
     public String getFilePath(Uri uri) {
@@ -51,8 +63,9 @@ public class FileHelper {
         Cursor cursor = null;
 
         if (uri.getScheme().equals("content")) {
-            cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
             try {
+                cursor = this.reactContext.getContentResolver().query(uri, null, null, null, null);
+
                 if (cursor != null && cursor.moveToFirst()) {
                     int columnIndex;
                     columnIndex = cursor.getColumnIndex(columns[0]);
@@ -70,15 +83,24 @@ public class FileHelper {
                 result = result.substring(cut + 1);
             }
         }
-
         return result;
     }
 
-    public WritableMap getFileData(Uri uri) {
+    public WritableMap getFileData(Uri uri, Context currentActivity) {
+        String realPath = RealPathUtil.getRealPathFromURI(currentActivity, uri);
+        String mime = "";
+        if (realPath != null) {
+            Uri path = Uri.parse(realPath);
+            if (path.getScheme() == null) {
+                path = Uri.parse("file://"+ realPath);
+            }
+            mime = this.getMimeType(path);
+            realPath = path.toString();
+        }
         WritableMap fileData = new WritableNativeMap();
         fileData.putString("name", this.getFileName(uri));
-        fileData.putString("mime", this.getMimeType(uri));
-        fileData.putString("path", "");
+        fileData.putString("mime", mime);
+        fileData.putString("path", realPath);
         fileData.putString("uri", uri.toString());
 
         return fileData;

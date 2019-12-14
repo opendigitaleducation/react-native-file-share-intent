@@ -1,4 +1,3 @@
-
 package com.ajithab;
 
 import com.facebook.react.bridge.ActivityEventListener;
@@ -36,6 +35,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
 
     String action = intent.getAction();
     String type = intent.getType();
+    Activity currentActivity = getCurrentActivity();
 
     if(action == null || type == null)
       return;
@@ -48,10 +48,10 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
         String input = intent.getStringExtra(Intent.EXTRA_TEXT);
         successCallback.invoke(input, type);
       } else if (type.startsWith("application/") || type.startsWith("audio/") || type.startsWith("image/") ||
-          type.startsWith("video/")) {
+              type.startsWith("video/")) {
         Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (fileUri != null) {
-          res.pushMap(fileHelper.getFileData(fileUri));
+          res.pushMap(fileHelper.getFileData(fileUri, currentActivity));
           successCallback.invoke(res);
         }
       }
@@ -60,7 +60,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
         ArrayList<Uri> fileUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
         if (fileUris != null) {
           for (Uri uri : fileUris) {
-            res.pushMap(fileHelper.getFileData(uri));
+            res.pushMap(fileHelper.getFileData(uri), currentActivity);
           }
           successCallback.invoke(res);
         }
@@ -86,7 +86,6 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
       intent.removeExtra(Intent.EXTRA_STREAM);
     }
   }
-
   @Override
   public String getName() {
     return "RNFileShareIntent";
