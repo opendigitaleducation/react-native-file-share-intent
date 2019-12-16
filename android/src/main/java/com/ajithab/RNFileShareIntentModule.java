@@ -35,7 +35,6 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
 
     String action = intent.getAction();
     String type = intent.getType();
-    Activity currentActivity = getCurrentActivity();
 
     if(action == null || type == null)
       return;
@@ -51,7 +50,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
               type.startsWith("video/")) {
         Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (fileUri != null) {
-          res.pushMap(fileHelper.getFileData(fileUri, currentActivity));
+          res.pushMap(fileHelper.getFileData(fileUri);
           successCallback.invoke(res);
         }
       }
@@ -60,7 +59,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
         ArrayList<Uri> fileUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
         if (fileUris != null) {
           for (Uri uri : fileUris) {
-            res.pushMap(fileHelper.getFileData(uri), currentActivity);
+            res.pushMap(fileHelper.getFileData(uri));
           }
           successCallback.invoke(res);
         }
@@ -86,6 +85,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
       intent.removeExtra(Intent.EXTRA_STREAM);
     }
   }
+
   @Override
   public String getName() {
     return "RNFileShareIntent";

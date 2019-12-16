@@ -86,21 +86,11 @@ public class FileHelper {
         return result;
     }
 
-    public WritableMap getFileData(Uri uri, Context currentActivity) {
-        String realPath = RealPathUtil.getRealPathFromURI(currentActivity, uri);
-        String mime = "";
-        if (realPath != null) {
-            Uri path = Uri.parse(realPath);
-            if (path.getScheme() == null) {
-                path = Uri.parse("file://"+ realPath);
-            }
-            mime = this.getMimeType(path);
-            realPath = path.toString();
-        }
+    public WritableMap getFileData(Uri uri) {
         WritableMap fileData = new WritableNativeMap();
         fileData.putString("name", this.getFileName(uri));
-        fileData.putString("mime", mime);
-        fileData.putString("path", realPath);
+        fileData.putString("mime", this.getMimeType(uri));
+        fileData.putString("path", "");
         fileData.putString("uri", uri.toString());
 
         return fileData;
