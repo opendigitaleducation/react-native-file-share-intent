@@ -1,7 +1,5 @@
 package com.ajithab;
 
-import android.content.ContentResolver;
-import android.content.Context;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
@@ -10,7 +8,6 @@ import android.net.Uri;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.webkit.MimeTypeMap;
 
 public class FileHelper {
 
@@ -45,16 +42,7 @@ public class FileHelper {
     }
 
     public String getMimeType(Uri uri) {
-        String mimeType = null;
-        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
-            mimeType = this.reactContext.getContentResolver().getType(uri);
-        } else {
-            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
-                    .toString());
-            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                    fileExtension.toLowerCase());
-        }
-        return mimeType;
+        return this.reactContext.getContentResolver().getType(uri);
     }
 
     public String getFilePath(Uri uri) {
@@ -83,6 +71,7 @@ public class FileHelper {
                 result = result.substring(cut + 1);
             }
         }
+
         return result;
     }
 
