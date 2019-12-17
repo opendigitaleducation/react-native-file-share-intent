@@ -1,39 +1,83 @@
-
 package com.ajithab;
 
 import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import android.util.Log;
+import android.widget.Toast;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 
-public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
+
+public class RNFileShareIntentModule extends ReactContextBaseJavaModule implements ActivityEventListener, LifecycleEventListener {
+
+  private Callback successShareCallback;
   private final ReactApplicationContext reactContext;
+  private Intent mIntent = null;
+  private boolean mProcessing = false;
 
   public RNFileShareIntentModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
+    reactContext.addActivityEventListener(this);
+    reactContext.addLifecycleEventListener(this);
+  }
+
+  @Override
+  public void onNewIntent(Intent aIntent) {
+    /* if all processing is made on onNewIntent, that not works on the second call when application in background */
+    if (mIntent == null) {
+      mIntent = aIntent;
+    }
+  }
+
+  @Override
+  public void onHostResume() {
+    if (mIntent != null && !mProcessing) {
+      mProcessing = true;
+      shareFile(mIntent);
+    }
+  }
+
+  @Override
+  public void onHostPause() {
+    mIntent = null;
+    mProcessing = true;
+  }
+
+  @Override
+  public void onHostDestroy() {
+    // Activity `onDestroy`
+  }
+
+  @ReactMethod
+  public void setCallback(Callback successCallback) {
+    successShareCallback = successCallback;
   }
 
   @ReactMethod
   public void getFilePath(Callback successCallback) {
-
+    successShareCallback = successCallback;
     Activity mActivity = getCurrentActivity();
 
     if(mActivity == null) { return; }
 
     Intent intent = mActivity.getIntent();
-    if (intent == null)
-      return;
+    shareFile(intent);
+  }
 
+  private void shareFile(Intent intent) {
     String action = intent.getAction();
     String type = intent.getType();
     Activity currentActivity = getCurrentActivity();
@@ -43,17 +87,16 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
 
     FileHelper fileHelper = new FileHelper(this.reactContext);
 
-    WritableArray res = new WritableNativeArray();
+    WritableMap res = new WritableNativeMap();
     if (Intent.ACTION_SEND.equals(action)) {
       if (type.startsWith("text/plain")) {
         String input = intent.getStringExtra(Intent.EXTRA_TEXT);
-        successCallback.invoke(input, type);
+        successShareCallback.invoke(input, type);
       } else if (type.startsWith("application/") || type.startsWith("audio/") || type.startsWith("image/") ||
               type.startsWith("video/")) {
         Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (fileUri != null) {
-          res.pushMap(fileHelper.getFileData(fileUri, currentActivity));
-          successCallback.invoke(res);
+          sendEvent( fileHelper.getFileData(fileUri, currentActivity));
         }
       }
     } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
@@ -61,9 +104,9 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
         ArrayList<Uri> fileUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
         if (fileUris != null) {
           for (Uri uri : fileUris) {
-            res.pushMap(fileHelper.getFileData(uri, currentActivity));
+//            res.putString( "data", fileHelper.getFileData(uri, currentActivity));
           }
-          successCallback.invoke(res);
+//          sendEvent(res);
         }
       }
     }
@@ -90,9 +133,18 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule {
       intent.removeExtra(Intent.EXTRA_STREAM);
     }
   }
-
   @Override
   public String getName() {
     return "RNFileShareIntent";
   }
+
+  @Override
+  public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {}
+
+  private void sendEvent(WritableMap params) {
+    reactContext
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit("FileShareIntent", params);
+  }
 }
+
