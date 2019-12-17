@@ -25,7 +25,6 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
   private Callback successShareCallback;
   private final ReactApplicationContext reactContext;
   private Intent mIntent = null;
-  private boolean mProcessing = false;
 
   public RNFileShareIntentModule(ReactApplicationContext reactContext) {
     super(reactContext);
@@ -37,6 +36,7 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
   @Override
   public void onNewIntent(Intent aIntent) {
     /* if all processing is made on onNewIntent, that not works on the second call when application in background */
+
     if (mIntent == null) {
       mIntent = aIntent;
     }
@@ -44,21 +44,20 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
 
   @Override
   public void onHostResume() {
-    if (mIntent != null && !mProcessing) {
-      mProcessing = true;
-      shareFile(mIntent);
+    Intent aIntent =  mIntent;
+
+    if (mIntent != null) {
+      mIntent = null;
+      shareFile(aIntent);
     }
   }
 
   @Override
   public void onHostPause() {
-    mIntent = null;
-    mProcessing = true;
   }
 
   @Override
   public void onHostDestroy() {
-    // Activity `onDestroy`
   }
 
   @ReactMethod
@@ -147,4 +146,3 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
             .emit("FileShareIntent", params);
   }
 }
-
