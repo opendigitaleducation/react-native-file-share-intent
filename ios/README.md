@@ -1,22 +1,26 @@
-
 # react-native-file-share-intent
 
-Adds the application to the share intent of the device, so it can be launched from other apps and receive data from them 
-
+Adds the application to the share intent of the device, so it can be launched from other apps and receive data from them
 
 ## Installation
 
-* Install the module
+- Install the module
 
 ```bash
 npm i --save react-native-file-share-intent
 ```
 
-# IOS Installation
+## IOS Installation
 
+- [Extension creation](###Extension-creation)
+- [Link dependencies (without pods)](###Link-dependencies-(without-pods))
+- [Link dependencies (with pods)](###Link-dependencies-(with-pods))
+- [For IOS Share Extension View](###For-IOS-Share-Extension-View)
 
-- Click on your project's name
-- Click on `+` sign
+### Extension creation
+
+* Click on your project's name
+* Click on `+` sign
 
 <p align="center">
 <img src ="https://github.com/ajith-ab/react-native-file-share-intent/blob/master/assets/ios_step_01.png" />
@@ -34,7 +38,7 @@ npm i --save react-native-file-share-intent
 <img src ="https://github.com/ajith-ab/react-native-file-share-intent/blob/master/assets/ios_step_03.png" />
 </p>
 
-- Select both files  `ShareViewController.h` and `ShareViewController.m`. 
+- Select both files `ShareViewController.h` and `ShareViewController.m`.
 
 <p align="center">
 <img src ="https://github.com/ajith-ab/react-native-file-share-intent/blob/master/assets/ios_step_04.png" />
@@ -52,6 +56,7 @@ npm i --save react-native-file-share-intent
 ```
 
 - Copy the below code and paste into the `ShareViewController.m`
+
 ```objective-c
 #import "ShareViewController.h"
 #import "RCTRootView.h"
@@ -64,48 +69,45 @@ npm i --save react-native-file-share-intent
 
 @implementation ShareViewController
 
-- (void) loadView
-{
-NSURL *jsCodeLocation;
+- (void) loadView {
 
-NSExtensionItem *item = self.extensionContext.inputItems.firstObject;
-NSItemProvider *itemProvider = item.attachments.firstObject;
-[RNFileShareIntent setShareFileIntentModule_itemProvider:itemProvider];
-[RNFileShareIntent setContext: self.extensionContext];
-
-
-#if DEBUG
-jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"Share" fallbackResource:nil];
-#else
-jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/share.bundle?platform=ios&dev=true"]; 
-// Change localhost to your network Ip for your Device Debugging
-#endif
+  NSURL *jsCodeLocation;
+  NSExtensionItem *item = self.extensionContext.inputItems.firstObject;
+  NSItemProvider *itemProvider = item.attachments.firstObject;
+  [RNFileShareIntent setShareFileIntentModule_itemProvider:itemProvider];
+  [RNFileShareIntent setContext: self.extensionContext];
 
 
-RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
-moduleName:@"Share"
-initialProperties:nil
-launchOptions:nil];
-self.view = rootView;
+  #if DEBUG
+    jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"Share" fallbackResource:nil];
+  #else
+    jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/share.bundle?platform=ios&dev=true"];
+    // Change localhost to your network Ip for your Device Debugging
+  #endif
+
+
+  RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
+                                                moduleName:@"Share"
+                                                initialProperties:nil
+                                                launchOptions:nil];
+  self.view = rootView;
 }
 
 // animate (IN)
-- (void)viewWillAppear:(BOOL)animated
-{
-[super viewWillAppear:animated];
+- (void)viewWillAppear:(BOOL)animated {
 
-self.view.transform = CGAffineTransformMakeTranslation(0, self.view.frame.size.height);
-[UIView animateWithDuration:0.25 animations:^
-{
-self.view.transform = CGAffineTransformIdentity;
-}];
+  [super viewWillAppear:animated];
+  self.view.transform = CGAffineTransformMakeTranslation(0, self.view.frame.size.height);
+  [UIView animateWithDuration:0.25 animations:^ {
+    self.view.transform = CGAffineTransformIdentity;
+  }];
 }
-
 
 @end
 
 ```
 
+### Link dependencies (without pods)
 
 - Now it's time to add our library. Right click on the `Libraries` group and select `Add Files to "Sample1"...`
 
@@ -175,97 +177,105 @@ self.view.transform = CGAffineTransformIdentity;
   </dict>
 ```
 
+### Link dependencies (with pods)
+
+- In your main project's Podfile, add a new target for your extension
+
+```ruby
+target 'yourExtensionName' do
+  inherit! :search_paths
+end
+```
+
+- In the Build Settings of your share extension, add a value `$(inherited)` to your Header Search Paths
+
+<p align="center">
+<img src ="https://github.com/JacquesBonet/react-native-file-share-intent/blob/master/assets/ios_step_12.png" />
+</p>
+
+
 ### For IOS Share Extension View
 
 Share.js in the Root Folder
 
 ```javascript
-import React, { Component } from 'react';
-import { View, Text, AppRegistry, StyleSheet, Button } from 'react-native';
-import RNFileShareIntent from 'react-native-file-share-intent';
+import React, { Component } from "react";
+import { View, Text, AppRegistry, StyleSheet, Button } from "react-native";
+import RNFileShareIntent from "react-native-file-share-intent";
 export default class Share extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            sharedText: null
-        };
-    }
-    componentDidMount() {
-        var that = this;
-        RNFileShareIntent.getFilePath((text) => {
-            that.setState({ sharedText: text });
+  constructor(props) {
+    super(props);
+    this.state = {
+      sharedText: null
+    };
+  }
+  componentDidMount() {
+    var that = this;
+    RNFileShareIntent.getFilePath(text => {
+      that.setState({ sharedText: text });
+    });
+  }
 
-        })
-    }
-
-    render() {
-        var url = this.state.sharedText;
-        return (
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-                <Text style={styles.text}>Shared file Path: {url}</Text>
-                <Button
-                    title="open With Other App"
-                    color="#841584"
-                    onPress={() => RNFileShareIntent.openURL(url)}
-                />
-                <Button
-                    title="Close Extension"
-                    color="#841584"
-                    onPress={() => RNFileShareIntent.close()}
-                />
-            </View>
-        )
-    }
+  render() {
+    var url = this.state.sharedText;
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <Text style={styles.text}>Shared file Path: {url}</Text>
+        <Button
+          title="open With Other App"
+          color="#841584"
+          onPress={() => RNFileShareIntent.openURL(url)}
+        />
+        <Button
+          title="Close Extension"
+          color="#841584"
+          onPress={() => RNFileShareIntent.close()}
+        />
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
-    text: {
-        color: 'black',
-        backgroundColor: 'white',
-        fontSize: 30,
-        margin: 80
-    }
+  text: {
+    color: "black",
+    backgroundColor: "white",
+    fontSize: 30,
+    margin: 80
+  }
 });
 
-AppRegistry.registerComponent('Share', () => Share);
-
+AppRegistry.registerComponent("Share", () => Share);
 ```
-
-
 
 Or check the "example" directory for an example application.
 
-### Donate
+## Communication Between Main App and Share Extension
 
-<p><a href="https://www.paypal.me/ajithab" rel="nofollow"><img height="75" src="https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png" style="max-width:100%;"></a></p>
-
-
-## Communication Between Main App and Share Extension 
-
-- create a Same App group For `Main App` and `Share Extension` through Select the Main App or Share Extension and Select `Capablities tab`  then select App group `create group with same name`
+- create a Same App group For `Main App` and `Share Extension` through Select the Main App or Share Extension and Select `Capablities tab` then select App group `create group with same name`
 
 <p align="center">
 <img src ="https://github.com/ajith-ab/react-native-file-share-intent/blob/master/assets/appgroup.png" />
 </p>
 
- ###  Message Communication 
-   
-  ```bash
-  npm install --save react-native-swiss-knife
-  ```
-  
- - To save a value on your main app:
- 
- ```Javascript
+### Message Communication
+
+```bash
+npm install --save react-native-swiss-knife
+```
+
+- To save a value on your main app:
+
+```Javascript
 import { RNSKBucket } from 'react-native-swiss-knife'
 
 const myGroup = 'group.groupName'
 RNSKBucket.set('test', 'myValue', myGroup)
- ```
- 
- - and then, to read the saved data on your shared extension:
- 
- ```Javascript
+```
+
+- and then, to read the saved data on your shared extension:
+
+```Javascript
 import { RNSKBucket } from 'react-native-swiss-knife'
 
 const myGroup = 'group.groupName'
@@ -274,7 +284,7 @@ RNSKBucket.get('test', myGroup).then( (value) => console.log(value) ) // myValue
 
 ### Manage Files
 
-- Use  <a href="https://www.npmjs.com/package/react-native-fs">  react-native-fs</a>
+- Use <a href="https://www.npmjs.com/package/react-native-fs"> react-native-fs</a>
 
 - In Share Extension
 
@@ -286,12 +296,13 @@ var path = RNFS.pathForGroup('group.groupName');
 path = path+'filename.txt'; // according to files use .jpeg, .pdf etc ...
 RNFS.copyFile(url, path) // url-> path getting From Share Extension, path -> copying Location
     .then((success) => {
-      
+
     })
     .catch((err) => {
       console.log("Error: " + err.message);
     });
 ```
+
 - In Main App
 
 ```Javascript
@@ -299,10 +310,10 @@ RNFS.copyFile(url, path) // url-> path getting From Share Extension, path -> cop
 import * as RNFS from 'react-native-fs';
 
 var path = RNFS.pathForGroup('group.groupName');
-RNFS.readDir(path) 
+RNFS.readDir(path)
   .then((result) => {
     console.log('GOT RESULT', result);
- 
+
     // stat the first file
     return Promise.all([RNFS.stat(result[0].path), result[0].path]);
   })
@@ -311,7 +322,7 @@ RNFS.readDir(path)
       // if we have a file, read it
       return RNFS.readFile(statResult[1], 'utf8');
     }
- 
+
     return 'no file';
   })
   .then((contents) => {
@@ -322,28 +333,31 @@ RNFS.readDir(path)
     console.log(err.message, err.code);
   });
 ```
+
 ### Opening Share Extension in Main App
 
 - In Share Extension
 
 ```javascript
-import RNFileShareIntent from 'react-native-file-share-intent';
+import RNFileShareIntent from "react-native-file-share-intent";
 
-RNFileShareIntent.openURL(url)
-
+RNFileShareIntent.openURL(url);
 ```
-- In Main App 
 
- Refer <a href="https://medium.com/react-native-training/deep-linking-your-react-native-app-d87c39a1ad5e"> Linking</a>
+- In Main App
+
+Refer <a href="https://medium.com/react-native-training/deep-linking-your-react-native-app-d87c39a1ad5e"> Linking</a>
 
 ```javascript
-import { Linking } from 'react-native';
+import { Linking } from "react-native";
 
- Linking.getInitialURL().then((url) => {
+Linking.getInitialURL()
+  .then(url => {
     if (url) {
-      console.log('Initial url is: ' + url);
+      console.log("Initial url is: " + url);
     }
-  }).catch(err => console.error('An error occurred', err));
+  })
+  .catch(err => console.error("An error occurred", err));
 ```
 
 ## Credits
