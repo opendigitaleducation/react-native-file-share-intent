@@ -1,6 +1,10 @@
 #import <Foundation/Foundation.h>
 #import <React/RCTBridgeModule.h>
+
 @interface RNFileShareIntent : NSObject<RCTBridgeModule>
-+(void) setShareFileIntentModule_itemProvider: (NSItemProvider*) itemProvider;
+
++(NSItemProvider *) extractDataFromContext:(NSExtensionContext*) context;
+
 +(void) setContext: (NSExtensionContext*) context;
+
 @end

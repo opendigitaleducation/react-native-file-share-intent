@@ -98,16 +98,6 @@ public class RNFileShareIntentModule extends ReactContextBaseJavaModule implemen
           sendEvent( fileHelper.getFileData(fileUri, currentActivity));
         }
       }
-    } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
-      if (type.startsWith("image/") || type.startsWith("video/") || type.startsWith("audio/") || type.startsWith("application/")) {
-        ArrayList<Uri> fileUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
-        if (fileUris != null) {
-          for (Uri uri : fileUris) {
-//            res.putString( "data", fileHelper.getFileData(uri, currentActivity));
-          }
-//          sendEvent(res);
-        }
-      }
     }
   }
 

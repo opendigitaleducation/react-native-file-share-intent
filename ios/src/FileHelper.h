@@ -10,12 +10,8 @@
 
 @interface FileHelper : NSObject
 
-+ (NSString *)MIMETypeFromURL:(NSURL *)localFileURL;
-
 + (NSString *)fileNameFromPath:(NSString *)filePath;
 
-+ (NSDictionary *)getFileData:(NSURL *)url;
-
-+ (void)clearSharedFolder;
++ (void) getItem:(NSItemProvider *)item completionHandler:(NSItemProviderCompletionHandler)completionHandler;
 
 @end
