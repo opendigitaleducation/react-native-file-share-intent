@@ -20,7 +20,7 @@ RCT_EXPORT_MODULE();
 RCT_REMAP_METHOD(getFilePath,
                  resolve:(RCTPromiseResolveBlock)resolve
                  reject:(RCTPromiseRejectBlock)reject ) {
-    [FileHelper getItem:[RNFileShareIntent extractDataFromContext:extContext] completionHandler:^(NSURL *item, NSError *error) {
+    [FileHelper getItem:[RNFileShareIntent extractDataFromContext] completionHandler:^(NSURL *item, NSError *error) {
        if(error) {
             reject(@"error", error.description, nil);
         } else {
@@ -31,6 +31,12 @@ RCT_REMAP_METHOD(getFilePath,
 
 RCT_EXPORT_METHOD(close) {
     [ extContext completeRequestReturningItems: @[] completionHandler: nil ];
+}
+
+RCT_EXPORT_METHOD(openURL:(NSString *)url) {
+    UIApplication *application = [UIApplication sharedApplication];
+    NSURL *urlToOpen = [NSURL URLWithString:[url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    [application openURL:urlToOpen options:@{} completionHandler: nil];
 }
 
 +(NSItemProvider *) extractDataFromContext {
