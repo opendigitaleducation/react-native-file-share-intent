@@ -37,7 +37,11 @@ RCT_EXPORT_METHOD(openURL:(NSString *)url) {
     UIApplication *application = [UIApplication sharedApplication];
     NSString *encodedURL =[url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     NSURL *urlToOpen = [NSURL URLWithString:encodedURL];
-    [application openURL:urlToOpen options:@{} completionHandler: nil];
+    if (@available(iOS 10.0, *)) {
+        [application openURL:urlToOpen options:@{} completionHandler: nil];
+    } else {
+        [application openURL:urlToOpen];
+    }
 }
 
 +(NSItemProvider *) extractDataFromContext {
