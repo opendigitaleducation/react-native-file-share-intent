@@ -10,8 +10,8 @@
 
 @interface FileHelper : NSObject
 
-+ (NSString *)fileNameFromPath:(NSString *)filePath;
++ (NSDictionary *)getFileData:(NSURL *)url;
 
-+ (void) getItem:(NSItemProvider *)item completionHandler:(NSItemProviderCompletionHandler)completionHandler;
++ (void) getFileUrl:(NSItemProvider *)item completionHandler:(NSItemProviderCompletionHandler)completionHandler;
 
 @end

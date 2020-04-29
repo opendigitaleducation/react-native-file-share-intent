@@ -17,31 +17,31 @@ static NSExtensionContext* extContext;
 
 RCT_EXPORT_MODULE();
 
-RCT_REMAP_METHOD(getFilePath,
+RCT_REMAP_METHOD(getFile,
                  resolve:(RCTPromiseResolveBlock)resolve
                  reject:(RCTPromiseRejectBlock)reject ) {
-    [FileHelper getItem:[RNFileShareIntent extractDataFromContext] completionHandler:^(NSURL *item, NSError *error) {
+    [FileHelper getFileUrl:[RNFileShareIntent extractDataFromContext] completionHandler:^(NSURL *item, NSError *error) {
        if(error) {
             reject(@"error", error.description, nil);
         } else {
-            resolve(@[item.absoluteString]);
+            resolve([FileHelper getFileData:item]);
         }
     }];
 }
 
-RCT_EXPORT_METHOD(close) {
-    [ extContext completeRequestReturningItems: @[] completionHandler: nil ];
-}
-
-RCT_EXPORT_METHOD(openURL:(NSString *)url) {
+RCT_REMAP_METHOD(openURL, url:(NSString *)url) {
+    NSURL *urlToOpen = [NSURL URLWithString:url];
     UIApplication *application = [UIApplication sharedApplication];
-    NSString *encodedURL =[url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-    NSURL *urlToOpen = [NSURL URLWithString:encodedURL];
+
     if (@available(iOS 10.0, *)) {
         [application openURL:urlToOpen options:@{} completionHandler: nil];
     } else {
         [application openURL:urlToOpen];
     }
+}
+
+RCT_EXPORT_METHOD(close) {
+    [ extContext completeRequestReturningItems: @[] completionHandler: nil ];
 }
 
 +(NSItemProvider *) extractDataFromContext {

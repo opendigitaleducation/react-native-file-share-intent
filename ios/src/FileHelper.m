@@ -11,12 +11,30 @@
 
 @implementation FileHelper
 
-+ (NSString *)fileNameFromPath:(NSString *)filePath
++ (NSDictionary *)getFileData:(NSURL *)url
+{
+    NSDictionary *fileData = @{
+                               @"mime": [FileHelper getMimeTypeFromPath:url],
+                               @"name": [FileHelper getFileNameFromPath:url],
+                               @"uri": url.absoluteString
+                               };
+
+    return fileData;
+}
+
++ (NSString *) getFileNameFromPath:(NSURL *)filePath
 {
     return [filePath lastPathComponent];
 }
 
-+ (void) getItem:(NSItemProvider *)item completionHandler:(NSItemProviderCompletionHandler)completionHandler {
++ (NSString *) getMimeTypeFromPath:(NSURL *)filePath
+{
+    CFStringRef fileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef _Nonnull)([filePath pathExtension]), nil);
+    CFStringRef fileMimeType = UTTypeCopyPreferredTagWithClass(fileUTI, kUTTagClassMIMEType);
+    return (__bridge NSString *)(fileMimeType);
+}
+
++ (void) getFileUrl:(NSItemProvider *)item completionHandler:(NSItemProviderCompletionHandler)completionHandler {
 
     if ([item hasItemConformingToTypeIdentifier:(NSString *)kUTTypeData]) {
         [item loadItemForTypeIdentifier:(NSString *)kUTTypeData options:nil completionHandler:completionHandler];
