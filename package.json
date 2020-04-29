@@ -19,5 +19,7 @@
   "bugs": {
     "url": "https://github.com/opendigitaleducation/react-native-file-share-intent/issues"
   },
-  "homepage": "https://github.com/opendigitaleducation/react-native-file-share-intent#readme"
+  "homepage": "https://github.com/opendigitaleducation/react-native-file-share-intent#readme",
+  "devDependencies": {},
+  "dependencies": {}
 }
