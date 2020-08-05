@@ -3,23 +3,27 @@
   "version": "1.1.2",
   "description": "Adds the app to share menu, so it can be launched from share menu and receive data from other apps",
   "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/opendigitaleducation/react-native-file-share-intent.git"
-  },
-  "keywords": [
-    "ios",
+  "files": [
+    "README.md",
     "android",
-    "react-native",
-    "share",
-    "extension"
+    "index.js",
+    "ios",
+    "RNFileShareIntent.podspec"
   ],
   "author": "opendigitaleducation",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/opendigitaleducation/react-native-file-share-intent/issues"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opendigitaleducation/react-native-file-share-intent.git",
+    "baseUrl": "https://github.com/opendigitaleducation/react-native-file-share-intent"
   },
-  "homepage": "https://github.com/opendigitaleducation/react-native-file-share-intent#readme",
-  "devDependencies": {},
-  "dependencies": {}
+  "homepage": "https://github.com/opendigitaleducation/react-native-file-share-intent",
+  "peerDependencies": {
+    "react": "^16.8.1",
+    "react-native": ">=0.60.0-rc.0 <1.0.x"
+  },
+  "devDependencies": {
+    "react": "^16.9.0",
+    "react-native": "^0.61.5"
+  }
 }
