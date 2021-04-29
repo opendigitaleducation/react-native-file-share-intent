@@ -103,8 +103,9 @@ public class RealPathUtil {
             cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
                     null);
             if (cursor != null && cursor.moveToFirst()) {
-                final int index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(index);
+                // Crash fix : java.lang.IllegalArgumentException: column '_data' does not exist. Available columns: []
+                final int index = cursor.getColumnIndex(column);
+                if (index > -1) return cursor.getString(index);
             }
         } finally {
             if (cursor != null)
