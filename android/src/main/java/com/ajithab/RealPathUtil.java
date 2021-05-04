@@ -23,7 +23,7 @@ public class RealPathUtil {
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
         // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+        if (isKitKat /* && DocumentsContract.isDocumentUri(context, uri)*/) {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
@@ -39,11 +39,12 @@ public class RealPathUtil {
             // DownloadsProvider
             else if (isDownloadsDocument(uri)) {
 
-                final String id = DocumentsContract.getDocumentId(uri);
+                /*final String id = DocumentsContract.getDocumentId(uri);
                 final Uri contentUri = ContentUris.withAppendedId(
                         Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
 
-                return getDataColumn(context, contentUri, null, null);
+                return getDataColumn(context, contentUri, null, null);*/
+                return uri.getPath();
             }
             // MediaProvider
             else if (isMediaDocument(uri)) {
@@ -66,6 +67,12 @@ public class RealPathUtil {
                 };
 
                 return getDataColumn(context, contentUri, selection, selectionArgs);
+            } else {
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
             }
         }
         // MediaStore (and general)
@@ -77,7 +84,7 @@ public class RealPathUtil {
             return uri.getPath();
         }
 
-        return null;
+        return uri.getPath();
     }
 
     /**
